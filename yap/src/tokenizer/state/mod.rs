@@ -43,3 +43,37 @@ impl<'a> State<'a> {
   }
 */
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::tokenizer::state::State;
+
+  #[test]
+  fn root_checks() {
+    let mut context = State::context();
+    let root = State::new(&mut context, None);
+    assert_eq!(1, root.id);
+    assert!(root.is_root_state());
+    let _st = State::new(&mut context, Some(&root));
+    assert_eq!(2, _st.id);
+    assert!(!_st.is_root_state());
+  }
+
+  #[test]
+  #[should_panic]
+  fn dont_pass_root_state() {
+    let mut context = State::context();
+    let _root = State::new(&mut context, None);
+    // every state after the first should pass the initial state in the constructor
+    let _st = State::new(&mut context, None);
+  }
+
+  #[test]
+  fn check_constructor() {
+    let mut context = State::context();
+    let root = State::new(&mut context, None);
+    assert!(root.emit_token.is_none());
+    assert!(root.root.is_none());
+    //assert_eq!(root.transitions.len(), 0);
+  }
+}
