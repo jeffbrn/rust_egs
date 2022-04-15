@@ -1,13 +1,16 @@
+pub mod transition;
+
 use std::sync::atomic::{AtomicI32, Ordering};
+use crate::tokenizer::state::transition::transitions::Transition;
 
 pub struct IdMgr {
   next_id : AtomicI32,
 }
 
 pub struct State<'a> {
-  pub id : i32,
-  pub root: Option<&'a State<'a>>,
-  //pub transitions: Vec<Transition<'a>>,
+  id : i32,
+  root: Option<&'a State<'a>>,
+  transitions: Vec<Transition<'a>>,
   pub emit_token : Option<i32>
 }
 
@@ -24,13 +27,13 @@ impl<'a> State<'a> {
         },
         _ => (),
     }
-    State { id, root, /*transitions: Vec::new(),*/ emit_token : None }
+    State { id, root, transitions: Vec::new(), emit_token : None }
   }
 
   pub fn is_root_state(&self) -> bool {
     self.id == 1
   }
-/*
+
   pub fn walk(&self, ch: char) -> &State {
     if self.is_root_state() && char::is_whitespace(ch) {
       return self
@@ -38,10 +41,12 @@ impl<'a> State<'a> {
     let trans = self.transitions.iter().find(|&x| x.do_transition(ch));
     match trans {
         Some(t) => t.next,
-        None => self
+        None => match self.root {
+            Some(r) => r,
+            None => self,
+        },
     }
   }
-*/
 }
 
 #[cfg(test)]
@@ -74,6 +79,6 @@ mod tests {
     let root = State::new(&mut context, None);
     assert!(root.emit_token.is_none());
     assert!(root.root.is_none());
-    //assert_eq!(root.transitions.len(), 0);
+    assert_eq!(root.transitions.len(), 0);
   }
 }
