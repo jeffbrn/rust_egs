@@ -39,7 +39,7 @@ pub mod transitions {
 
     fn setup<'a>() -> State<'a> {
       let mut context = State::context();
-      return State::new(&mut context, None);
+      return State::new(&mut context, None, &[]);
     }
     
     #[test]

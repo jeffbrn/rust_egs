@@ -10,7 +10,7 @@ pub struct IdMgr {
 pub struct State<'a> {
   id : i32,
   root: Option<&'a State<'a>>,
-  transitions: Vec<Transition<'a>>,
+  transitions: Vec<&'a Transition<'a>>,
   pub emit_token : Option<i32>
 }
 
@@ -19,7 +19,7 @@ impl<'a> State<'a> {
     IdMgr { next_id: AtomicI32::new(1) }
   }
 
-  pub fn new(context: &mut IdMgr, root: Option<&'a State<'a>>) -> State<'a> {
+  pub fn new(context: &mut IdMgr, root: Option<&'a State<'a>>, trans: &'a [Transition]) -> State<'a> {
     let id = context.next_id.fetch_add(1, Ordering::SeqCst);
     match root {
         None => if id > 1 {
@@ -27,7 +27,17 @@ impl<'a> State<'a> {
         },
         _ => (),
     }
-    State { id, root, transitions: Vec::new(), emit_token : None }
+    let mut transitions = Vec::new();
+    for t in trans {
+      transitions.push(t);
+    }
+    State { id, root, transitions, emit_token : None }
+  }
+
+  pub fn add_transitions(&mut self, trans: &'a [Transition<'a>]) {
+    for t in trans {
+      self.transitions.push(t);
+    }
   }
 
   pub fn is_root_state(&self) -> bool {
@@ -56,10 +66,10 @@ mod tests {
   #[test]
   fn root_checks() {
     let mut context = State::context();
-    let root = State::new(&mut context, None);
+    let root = State::new(&mut context, None, &[]);
     assert_eq!(1, root.id);
     assert!(root.is_root_state());
-    let _st = State::new(&mut context, Some(&root));
+    let _st = State::new(&mut context, Some(&root), &[]);
     assert_eq!(2, _st.id);
     assert!(!_st.is_root_state());
   }
@@ -68,15 +78,15 @@ mod tests {
   #[should_panic]
   fn dont_pass_root_state() {
     let mut context = State::context();
-    let _root = State::new(&mut context, None);
+    let _root = State::new(&mut context, None, &[]);
     // every state after the first should pass the initial state in the constructor
-    let _st = State::new(&mut context, None);
+    let _st = State::new(&mut context, None, &[]);
   }
 
   #[test]
   fn check_constructor() {
     let mut context = State::context();
-    let root = State::new(&mut context, None);
+    let root = State::new(&mut context, None, &[]);
     assert!(root.emit_token.is_none());
     assert!(root.root.is_none());
     assert_eq!(root.transitions.len(), 0);
@@ -85,15 +95,29 @@ mod tests {
   #[test]
   fn check_emit() {
     let mut context = State::context();
-    let mut root = State::new(&mut context, None);
+    let mut root = State::new(&mut context, None, &[]);
     root.emit_token = Some(1);
     assert!(!root.emit_token.is_none());
     assert_eq!(root.emit_token, Some(1));
   }
 
-  fn check_walk_next() {
+  #[test]
+  fn check_walk_whitespace_root() {
     let mut context = State::context();
-    let root = State::new(&mut context, None);
-    let _st = State::new(&mut context, Some(&root));
+    let root = State::new(&mut context, None, &[]);
+    let result = root.walk('\t');
+    assert_eq!(result.id, root.id);
+  }
+
+  #[test]
+  fn check_walk_root_invalid_char() {
+    let mut context = State::context();
+    let mut root = State::new(&mut context, None, &[]);
+    let _st = State::new(&mut context, Some(&root), &[]);
+    let t1 = Transition::new('a', 'z', None, &root);
+    let t = [t1];
+    root.add_transitions(&t);
+    let result = root.walk('\t');
+    assert_eq!(result.id, root.id);
   }
 }
