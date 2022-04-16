@@ -51,7 +51,7 @@ impl<'a> State<'a> {
 
 #[cfg(test)]
 mod tests {
-  use crate::tokenizer::state::State;
+  use super::*;
 
   #[test]
   fn root_checks() {
@@ -80,5 +80,20 @@ mod tests {
     assert!(root.emit_token.is_none());
     assert!(root.root.is_none());
     assert_eq!(root.transitions.len(), 0);
+  }
+
+  #[test]
+  fn check_emit() {
+    let mut context = State::context();
+    let mut root = State::new(&mut context, None);
+    root.emit_token = Some(1);
+    assert!(!root.emit_token.is_none());
+    assert_eq!(root.emit_token, Some(1));
+  }
+
+  fn check_walk_next() {
+    let mut context = State::context();
+    let root = State::new(&mut context, None);
+    let _st = State::new(&mut context, Some(&root));
   }
 }
