@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.16)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+project(EgCpp VERSION 0.0)
+
+add_library(egg_cpp STATIC)
+file(GLOB_RECURSE SOURCES src/*.cpp)
+set(SRC_FILES ${SOURCES})
+target_sources(egg_cpp PRIVATE ${SRC_FILES})
+target_include_directories(egg_cpp PUBLIC include)
