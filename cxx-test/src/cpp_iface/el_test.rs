@@ -1,0 +1,27 @@
+use super::bindings::Test1;
+use autocxx::WithinUniquePtr;
+use cxx::UniquePtr;
+
+pub struct ElTest {
+    wrapped: UniquePtr<Test1>,
+}
+
+impl ElTest {
+    pub fn new(msg: &str) -> Self {
+        cxx::let_cxx_string!(cxx_str = msg);
+        let wrapped = Test1::new(&cxx_str).within_unique_ptr();
+        ElTest { wrapped }
+    }
+
+    pub fn method_a(&mut self) -> bool {
+        self.wrapped.pin_mut().method_a()
+    }
+
+    pub fn get_msg(&mut self) -> String {
+        self.wrapped
+            .pin_mut()
+            .get_msg()
+            .to_string_lossy()
+            .into_owned()
+    }
+}
