@@ -1,6 +1,12 @@
 [package]
 name = "cxx-test"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 
 [dependencies]
+autocxx = "0.30"
+cxx = "1.0"
+
+[build-dependencies]
+autocxx-build = "0.30"
+miette = { version = "7.6", features = ["fancy"] } # For better error messages
