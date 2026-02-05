@@ -1,4 +1,4 @@
-use super::bindings::Test1;
+use super::bindings::{get_n, set_n, Test1};
 use autocxx::WithinUniquePtr;
 use cxx::UniquePtr;
 
@@ -23,5 +23,13 @@ impl ElTest {
             .get_msg()
             .to_string_lossy()
             .into_owned()
+    }
+
+    pub fn get_n(&self) -> i32 {
+        get_n(&self.wrapped)
+    }
+
+    pub fn set_n(&mut self, val: i32) {
+        set_n(&mut self.wrapped, val);
     }
 }
