@@ -60,9 +60,13 @@ pub fn bindings_build(
         bindings_src.as_ref().display()
     );
 
-    let mut b = autocxx_build::Builder::new(bindings_src, &includes)
-        .build()
-        .unwrap();
+    let mut b = match autocxx_build::Builder::new(bindings_src, &includes).build() {
+        Ok(builder) => builder,
+        Err(e) => {
+            println!("cargo:warning=autocxx Builder::build() failed: {}", e);
+            panic!("autocxx Builder::build() failed: {}", e);
+        }
+    };
     b.flag_if_supported("-std=c++17")
         .files(sources)
         .compile("autocxx-demo");
