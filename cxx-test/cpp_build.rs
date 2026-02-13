@@ -67,6 +67,7 @@ pub fn bindings_build(
             panic!("autocxx Builder::build() failed: {}", e);
         }
     };
+    
     b.flag_if_supported("-std=c++17")
         .files(sources)
         .compile("autocxx-demo");

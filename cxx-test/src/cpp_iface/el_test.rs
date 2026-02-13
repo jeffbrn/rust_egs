@@ -1,4 +1,4 @@
-use super::bindings::{get_n, set_n, Test1};
+use super::bindings::{get_n, set_n, Test1, dump};
 use autocxx::WithinUniquePtr;
 use cxx::UniquePtr;
 
@@ -31,5 +31,9 @@ impl ElTest {
 
     pub fn set_n(&mut self, val: i32) {
         set_n(&mut self.wrapped, val);
+    }
+
+    pub fn dump(&self, data: &[u32]) {
+        dump(data);
     }
 }

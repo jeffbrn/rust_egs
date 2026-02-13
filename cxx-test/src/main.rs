@@ -8,4 +8,7 @@ fn main() {
     println!("n = {}", tst.get_n());
     tst.set_n(123);
     println!("n = {}", tst.get_n());
+
+    let data: [u32; 5] = [1, 2, 3, 4, 5];
+    tst.dump(&data);
 }

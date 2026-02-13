@@ -17,6 +17,7 @@ mod ffi_wrapper {
 
         fn get_n(t: &Test1) -> i32;
         fn set_n(t: &mut Test1, val: i32);
+        fn dump(t: &[u32]);
     }
 }
 
